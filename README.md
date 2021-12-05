@@ -1,2 +1,2 @@
 # Shinto
-A custom Arch based Linux distro.
+A custom Artix based Linux distro.
