@@ -1,5 +1,18 @@
 #TAG,NAME IN REPO (or git url),PURPOSE (should be a verb phrase to sound right while installing)
 
+# Xorg
+,xorg-xinit,"starts the graphical server."
+,xorg-server,"is the graphical server."
+,xorg-xwininfo,"allows querying information about windows."
+,xorg-xbacklight,"enables changing screen brightness levels."
+,xorg-xprop,"is a tool for detecting window properties."
+,xcompmgr,"is for transparency and removing screen-tearing."
+,xwallpaper,"sets the wallpaper."
+,xcape,"gives the special escape/super mappings of SAIS."
+,xclip,"allows for copying and pasting from the command line."
+,xdotool,"provides window action utilities on the command line."
+,xorg-xdpyinfo,"aids with resolution determination and screen recording."
+
 # Linux utilities
 ,gnome-keyring,"serves as the system keyring."
 ,moreutils,"is a collection of useful unix tools."
@@ -55,19 +68,6 @@ A,sc-im,"is an Excel-like terminal spreadsheet manager."
 ,mediainfo,"shows audio and video information."
 ,unrar,"extracts rar's."
 ,unzip,"unzips zips."
-
-# Xorg
-,xorg-server,"is the graphical server."
-,xorg-xwininfo,"allows querying information about windows."
-,xorg-xinit,"starts the graphical server."
-,xorg-xbacklight,"enables changing screen brightness levels."
-,xorg-xprop,"is a tool for detecting window properties."
-,xcompmgr,"is for transparency and removing screen-tearing."
-,xwallpaper,"sets the wallpaper."
-,xcape,"gives the special escape/super mappings of SAIS."
-,xclip,"allows for copying and pasting from the command line."
-,xdotool,"provides window action utilities on the command line."
-,xorg-xdpyinfo,"aids with resolution determination and screen recording."
 
 # Misc
 ,libnotify,"allows desktop notifications."

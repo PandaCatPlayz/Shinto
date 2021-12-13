@@ -9,9 +9,9 @@ sudo su
 
 pacman -Syu
 
-pacman -Sy git wget base-devel
+pacman -Sy git curl base-devel
 
-curl -LO https://github.com/PandaCatPlayz/Shinto/tree/master/SAIS
+git clone https://github.com/PandaCatPlayz/Shinto/tree/master/SAIS
 
 cd SAIS
 
@@ -33,7 +33,7 @@ SAIS was forked from LARBS.
 ## Customization
 
 By default, SAIS uses the programs [here in progs.csv](progs.csv) and installs
-[my dotfiles repo (voidrice) here](https://github.com/lukesmithxyz/voidrice),
+[my dotfiles repo here](https://github.com/lukesmithxyz/voidrice),
 but you can easily change this by either modifying the default variables at the
 beginning of the script or giving the script one of these options:
 
