@@ -11,7 +11,9 @@ pacman -Syu
 
 pacman -Sy git wget base-devel
 
-curl -LO https://github.com/PandaCatPlayz/Shinto/SAIS
+curl -LO https://github.com/PandaCatPlayz/Shinto/tree/master/SAIS
+
+cd SAIS
 
 sh sais.sh
 ```

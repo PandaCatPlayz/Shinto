@@ -15,8 +15,9 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit 1 ;;
 esac done
 
+# Repositories and AUR
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/lukesmithxyz/voidrice.git"
-[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/LukeSmithxyz/LARBS/master/progs.csv"
+[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/PandaCatPlayz/Shinto/master/SAIS/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
@@ -26,12 +27,14 @@ installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
 
 error() { printf "%s\n" "$1" >&2; exit 1; }
 
+# Displays welcome message on screen
 welcomemsg() { \
 	dialog --title "Welcome" --msgbox "Welcome to SAIS.\\n\\nThis script automatically installs a branch of Artix linux, Shinto." 10 60
 
 	dialog --colors --title "Important Note!" --yes-label "All ready!" --no-label "Return..." --yesno "Be sure the computer you are using has current pacman updates and refreshed Arch keyrings.\\n\\nIf it does not, the installation of some programs might fail." 8 70
 	}
 
+# Grabs the Usename and Password from input box
 getuserandpass() { \
 	# Prompts user for new username an password.
 	name=$(dialog --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
@@ -46,6 +49,7 @@ getuserandpass() { \
 		pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done ;}
 
+# Check's if user already exists
 usercheck() { \
 	! { id -u "$name" >/dev/null 2>&1; } ||
 	dialog --colors --title "WARNING!" --yes-label "CONTINUE" --no-label "No wait..." --yesno "The user \`$name\` already exists on this system. SAIS can install for a user already existing, but it will \\Zboverwrite\\Zn any conflicting settings/dotfiles on the user account.\\n\\SAIS will \\Zbnot\\Zn overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that SAIS will change $name's password to the one you just gave." 14 70
@@ -55,6 +59,7 @@ preinstallmsg() { \
 	dialog --title "Let's get this party started!" --yes-label "Let's go!" --no-label "No, nevermind!" --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 13 60 || { clear; exit 1; }
 	}
 
+# Actually creates new User with set name and pass
 adduserandpass() { \
 	# Adds user `$name` with password $pass1.
 	dialog --infobox "Adding user \"$name\"..." 4 50
@@ -64,6 +69,7 @@ adduserandpass() { \
 	echo "$name:$pass1" | chpasswd
 	unset pass1 pass2 ;}
 
+# Grabs arch repos
 refreshkeys() { \
 	case "$(readlink -f /sbin/init)" in
 		*systemd* )
@@ -82,10 +88,12 @@ Include = /etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf
 			;;
 	esac ;}
 
+# Permission set for user to prevent multiple password checks
 newperms() { # Set special sudoers settings for install (or after).
 	sed -i "/#SAIS/d" /etc/sudoers
 	echo "$* #SAIS" >> /etc/sudoers ;}
 
+# Installs dep for AUR
 manualinstall() { # Installs $1 manually. Used only for AUR helper here.
 	# Should be run after repodir is created and var is set.
 	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
@@ -96,11 +104,13 @@ manualinstall() { # Installs $1 manually. Used only for AUR helper here.
 	sudo -u "$name" -D "$repodir/$1" makepkg --noconfirm -si >/dev/null 2>&1 || return 1
 }
 
-maininstall() { # Installs all needed programs from main repo.
+# Installs all needed programs from main repo.
+maininstall() {
 	dialog --title "SAIS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
 	installpkg "$1"
 	}
 
+# Clones git repo and uses make install from base-devel
 gitmakeinstall() {
 	progname="$(basename "$1" .git)"
 	dir="$repodir/$progname"
@@ -111,18 +121,21 @@ gitmakeinstall() {
 	make install >/dev/null 2>&1
 	cd /tmp || return 1 ;}
 
+# Uses AUR helper for packages not in git repos or more easily obtained from the more stable Arch repos
 aurinstall() { \
 	dialog --title "SAIS Installation" --infobox "Installing \`$1\` ($n of $total) from the AUR. $1 $2" 5 70
 	echo "$aurinstalled" | grep -q "^$1$" && return 1
 	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
 	}
 
+# Installs PIP for Python
 pipinstall() { \
 	dialog --title "SAIS Installation" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
 	[ -x "$(command -v "pip")" ] || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
 	}
 
+# Chooses which installer to use from git, AUR, PIP, or main
 installationloop() { \
 	([ -f "$progsfile" ] && cp "$progsfile" /tmp/progs.csv) || curl -Ls "$progsfile" | sed '/^#/d' > /tmp/progs.csv
 	total=$(wc -l < /tmp/progs.csv)
@@ -138,7 +151,8 @@ installationloop() { \
 		esac
 	done < /tmp/progs.csv ;}
 
-putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
+# Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
+putgitrepo() {
 	dialog --infobox "Downloading and installing config files..." 4 60
 	[ -z "$3" ] && branch="master" || branch="$repobranch"
 	dir=$(mktemp -d)
@@ -148,14 +162,17 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	sudo -u "$name" cp -rfT "$dir" "$2"
 	}
 
-systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
+# Beep Beep go bye bye
+systembeepoff() { dialog --infobox "Getting rid of that error beep sound..." 10 50
 	rmmod pcspkr
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
+# Finishes installations
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
 	dialog --title "Installation Complete." --msgbox "SAIS has completed successfully unless there were hidden errors.\\n\\nTo run the new graphical environment (DWM), log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1)." 12 80
 	}
+
 
 ### THE ACTUAL SCRIPT ###
 
