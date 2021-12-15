@@ -11,7 +11,7 @@ pacman -Syu
 
 pacman -Sy git curl base-devel
 
-git clone https://github.com/PandaCatPlayz/Shinto/tree/master/SAIS
+git clone https://github.com/PandaCatPlayz/Shinto/tree/master/SAIS.git
 
 cd SAIS
 
